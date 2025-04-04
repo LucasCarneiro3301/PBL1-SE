@@ -65,4 +65,4 @@ O sistema exibe números decrescentes em um conjunto de quatro displays de 7 seg
 # Vídeo de Demonstração
 [Link do vídeo](https://github.com/LucasCarneiro3301/PBL1-SE/blob/main/Sistemas%20Embarcados%20-%20Sem%C3%A1foro%20Inteligente.mp4)
 
-[![Assista ao vídeo]](https://github.com/LucasCarneiro3301/PBL1-SE/blob/main/Sistemas%20Embarcados%20-%20Sem%C3%A1foro%20Inteligente.mp4)
+[🎬 Ver vídeo demonstrativo](Sistemas%20Embarcados%20-%20Sem%C3%A1foro%20Inteligente.mp4)
