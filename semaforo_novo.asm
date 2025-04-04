@@ -47,9 +47,9 @@ display_number:
 	mov	A, @R0
 	movc	A, @A+DPTR
 
-	mov	P3, #0FFh
+	mov	P0, #0FFh
 	mov	P1, A
-	mov	P3, B
+	mov	P0, B
 
 	cjne	R0, #data_ptr, display_number
 	ret
@@ -78,6 +78,7 @@ start:
 	mov	DPTR, #numbers
 	mov	data_ptr+2, #0
 	mov	data_ptr+3, #0
+	MOV P2, #07H
 
 ; -----------------------------------------------
 ; MAIN LOOP
@@ -91,11 +92,12 @@ main:
 rotina_10_s:
 	mov	data_ptr+0, #0
 	mov	data_ptr+1, #1
+	MOV P2, #03H
 
 loop_10_s:
 	mov	R0, #data_ptr+data_len
 	call	display_number
-	call	delay_50ms
+	call	DELAY
 
 	call check_zero
 	jz fim_rotina
@@ -108,11 +110,12 @@ loop_10_s:
 rotina_3_s:
 	mov	data_ptr+0, #3
 	mov	data_ptr+1, #0
+	MOV P2, #05H
 
 loop_3_s:
 	mov	R0, #data_ptr+data_len
 	call	display_number
-	call	delay_50ms
+	call	DELAY
 
 	call check_zero
 	jz fim_rotina
@@ -125,11 +128,12 @@ loop_3_s:
 rotina_7_s:
 	mov	data_ptr+0, #7
 	mov	data_ptr+1, #0
+	MOV P2, #06H
 
 loop_7_s:
 	mov	R0, #data_ptr+data_len
 	call	display_number
-	call	delay_50ms
+	call	DELAY
 
 	call check_zero
 	jz fim_rotina
@@ -145,11 +149,11 @@ fim_rotina:
 ; -----------------------------------------------
 ; Delay de aproximadamente 50 ms com Timer 0
 ; -----------------------------------------------
-delay_50ms:
+DELAY:
 	mov TMOD, #01h      ; Timer 0, modo 1 (16 bits)
 	clr TF0             ; Limpa o flag de overflow
 	mov TH0, #0FFH      ; Carrega alto byte
-	mov TL0, #0C0H      ; Carrega baixo byte
+	mov TL0, #0E0H      ; Carrega baixo byte
 	setb TR0            ; Inicia Timer 0
 espera:
 	jnb TF0, espera     ; Espera overflow
