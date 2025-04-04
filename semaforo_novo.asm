@@ -121,24 +121,22 @@ START:
 ; MAIN LOOP
 ; -----------------------------------------------
 MAIN:
-	call ROTINA_10_S
-	call ROTINA_3_S
-	call ROTINA_7_S
-	jmp MAIN
-
-ROTINA_15_S:
-	MOV R6, #00H
-	MOV R0, #09H
-	mov	data_ptr+0, #5
-	mov	data_ptr+1, #1
-	mov	p2, #03h
-	jmp loop_10_s
+	call 	ROTINA_10_S
+	call 	ROTINA_3_S
+	call 	ROTINA_7_S
+	jmp 	MAIN
 
 ROTINA_10_S:
 	clr 	ie.0     ; Disable external interrupt
 	mov	data_ptr+0, #0
 	mov	data_ptr+1, #1
 	mov	p2, #03h
+	jmp 	LOOP_10_S
+
+ROTINA_15_S:
+	mov	r6, #01H
+	mov	data_ptr+0, #5
+	mov	data_ptr+1, #1
 
 LOOP_10_S:
 	setb 	ie.2
@@ -153,10 +151,10 @@ LOOP_10_S:
 	mov	r0, #data_ptr
 	call	DECREMENT_NUMBER
 
-	mov A, R6       ; Move R6 para o acumulador
-    	clr C
-    	SUBB A, #05H
-    	JNC ROTINA_15_S
+	mov 	A, R6       ; Move R6 para o acumulador
+    	clr 	C
+    	SUBB 	A, #05H
+    	JNC 	ROTINA_15_S
 
 	jmp	LOOP_10_S
 
@@ -215,7 +213,7 @@ FIM_ROTINA:
 	ret
 
 ; -----------------------------------------------
-; Delay de aproximadamente 50 ms com Timer 0
+; Delay
 ; -----------------------------------------------
 DELAY:
 	mov	th0, #0ffh      ; Carrega alto byte
