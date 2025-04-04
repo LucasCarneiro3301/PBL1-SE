@@ -36,16 +36,11 @@ numbers: db 11000000b ; 0
 ; -----------------------------------------------
 INTERRUPCAO_1:
 	mov r7, #00h
-
-	clr ie.0        ; Desativa interrupção externa 0 temporariamente
-	clr tcon.1      ; Limpa manualmente a flag de interrupção externa 0 (IE0)
-
 	reti  ; Force return to the main loop
 
 INTERRUPCAO_2:
 	inc r6
-
-	clr ie.2        ; Desativa interrupção externa 0 temporariamente
+	
 	clr tcon.1      ; Limpa manualmente a flag de interrupção externa 1 (IE1)
 
 	reti  ; Force return to the main loop
@@ -114,8 +109,8 @@ START:
 	mov 	r6, #01H
 	mov	r7, #01h
 
-	clr 	ie.0
-    	clr 	ie.2
+	setb 	ie.0     ; Disable external interrupt
+	setb 	ie.2
 
 ; -----------------------------------------------
 ; MAIN LOOP
@@ -127,11 +122,11 @@ MAIN:
 	jmp 	MAIN
 
 ROTINA_10_S:
-	clr 	ie.0     ; Disable external interrupt
+	setb 	ie.2
 	mov	data_ptr+0, #0
 	mov	data_ptr+1, #1
 	mov	p2, #03h
-	jmp 	LOOP_10_S
+	jmp	LOOP_10_S
 
 ROTINA_15_S:
 	mov	r6, #01H
@@ -139,7 +134,8 @@ ROTINA_15_S:
 	mov	data_ptr+1, #1
 
 LOOP_10_S:
-	setb 	ie.2
+	mov	a, r7
+	jz	FIM_ROTINA_10S
 
 	mov	r0, #data_ptr+data_len
 	call	DISPLAY_NUMBER
@@ -159,17 +155,21 @@ LOOP_10_S:
 	jmp	LOOP_10_S
 
 ROTINA_3_S:
+	clr 	ie.2
 	mov	data_ptr+0, #3
 	mov	data_ptr+1, #0
 	mov	p2, #05h
 
 LOOP_3_S:
+	mov	a, r7
+	jz	FIM_ROTINA_3S
+	
 	mov	r0, #data_ptr+data_len
 	call	DISPLAY_NUMBER
 	call	DELAY
 
 	call	CHECK_ZERO
-	jz	FIM_ROTINA
+	jz	FIM_ROTINA_3S
 
 	mov	r0, #data_ptr
 	call	DECREMENT_NUMBER
@@ -177,23 +177,26 @@ LOOP_3_S:
 	jmp	LOOP_3_S
 
 ROTINA_7_S:
+	clr 	ie.2
 	mov	data_ptr+0, #7
 	mov	data_ptr+1, #0
 	mov	p2, #06h
+	jmp	LOOP_7_S
+	
+EMERGENCIA:
+	mov	r7, #01h
+	mov	data_ptr+0, #5
+	mov	data_ptr+1, #1
 
 LOOP_7_S:
-	clr	ie.0     ; Disable external interrupt
-
+	mov	a, r7
+	jz	EMERGENCIA
+	
 	mov	r0, #data_ptr+data_len
 	call	DISPLAY_NUMBER
 	call	DELAY
 
-	setb	ie.0    ; Re-enable external interrupt
-
 	call	CHECK_ZERO
-	jz	FIM_ROTINA_7S
-
-	mov	a, r7
 	jz	FIM_ROTINA_7S
 
 	mov	r0, #data_ptr
@@ -209,7 +212,7 @@ FIM_ROTINA_10S:
 	mov r6, #01h
 	ret
 
-FIM_ROTINA:
+FIM_ROTINA_3S:
 	ret
 
 ; -----------------------------------------------
