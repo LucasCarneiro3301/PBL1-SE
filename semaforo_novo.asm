@@ -39,9 +39,10 @@ INTERRUPCAO_1:
 	reti  ; Force return to the main loop
 
 INTERRUPCAO_2:
-	inc r6
-	
+	clr ie.2
 	clr tcon.1      ; Limpa manualmente a flag de interrupção externa 1 (IE1)
+
+	inc r6
 
 	reti  ; Force return to the main loop
 
@@ -106,7 +107,7 @@ START:
 	mov	data_ptr+2, #0
 	mov	data_ptr+3, #0
 	mov	p2, #07h
-	mov 	r6, #01H
+	mov 	r6, #00H
 	mov	r7, #01h
 
 	setb 	ie.0     ; Disable external interrupt
@@ -121,19 +122,20 @@ MAIN:
 	call 	ROTINA_7_S
 	jmp 	MAIN
 
+ROTINA_15_S:
+	mov	r6, #00H
+	mov	data_ptr+0, #5
+	mov	data_ptr+1, #1
+	jmp	LOOP_10_S
+
 ROTINA_10_S:
 	setb 	ie.2
 	mov	data_ptr+0, #0
 	mov	data_ptr+1, #1
 	mov	p2, #03h
-	jmp	LOOP_10_S
-
-ROTINA_15_S:
-	mov	r6, #01H
-	mov	data_ptr+0, #5
-	mov	data_ptr+1, #1
 
 LOOP_10_S:
+	setb ie.2
 	mov	a, r7
 	jz	FIM_ROTINA_10S
 
@@ -209,7 +211,7 @@ FIM_ROTINA_7S:
 	ret
 
 FIM_ROTINA_10S:
-	mov r6, #01h
+	mov r6, #00h
 	ret
 
 FIM_ROTINA_3S:
