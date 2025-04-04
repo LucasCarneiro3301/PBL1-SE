@@ -40,7 +40,7 @@ O sistema exibe números decrescentes em um conjunto de quatro displays de 7 seg
 ## Como Executar
 ### Requisitos:
 - Um microcontrolador 8051 ou um simulador compatível (Keil uVision, Proteus, etc.).
-- Ambiente de desenvolvimento Assembly (ex: Keil uVision, ASM51).
+- Ambiente de desenvolvimento MCU 8051 IDE.
 
 ### Passo a Passo:
 1. Clone este repositório:
