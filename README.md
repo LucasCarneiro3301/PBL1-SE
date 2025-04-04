@@ -54,8 +54,8 @@ O sistema exibe números decrescentes em um conjunto de quatro displays de 7 seg
 
 ## Comportamento do Sistema
 - O número exibido nos displays começa a contar regressivamente.
-- Diferentes sequências de LEDs indicam estados do sistema (sinais verde, amarelo e vermelho).
-- Alterando as chaves DIP, o usuário pode iniciar a rotina do sinal vermelho com duração de 15 sega contagem ou contar o fluxo de veículos.
+- Os LEDs, que representam o semáforo, acompanham a contagem (sinais verde, amarelo e vermelho).
+- Alterando as chaves DIP, o usuário pode iniciar a rotina do sinal vermelho com duração de 15 segundos ou contar o fluxo de veículos.
 
 ## Personalização
 - Para alterar os números exibidos, edite a tabela de números na seção `numbers`.
