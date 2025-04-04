@@ -20,173 +20,211 @@ numbers: db 11000000b ; 0
 ; VECTORS
 ; -----------------------------------------------
 	org	0
-	jmp	start
+	jmp	START
 
-	ORG 003H
-    		LJMP INTERRUPCAO_1
+	org 003h
+	ljmp INTERRUPCAO_1
+
+	org 000bh   ; Vetor da interrupção do Timer 0
+	reti
+
+	org 0013h
+	ljmp INTERRUPCAO_2  ; Interrupção externa 1 (IE1)
 
 ; -----------------------------------------------
 ; SUBPROGRAMS
 ; -----------------------------------------------
 INTERRUPCAO_1:
-    MOV R7, #00H
+	mov r7, #00h
 
-    CLR IE.0        ; Desativa interrupção externa 0 temporariamente
-    CLR TCON.1      ; Limpa manualmente a flag de interrupção externa 0 (IE0)
+	clr ie.0        ; Desativa interrupção externa 0 temporariamente
+	clr tcon.1      ; Limpa manualmente a flag de interrupção externa 0 (IE0)
 
-    RETI  ; Force return to the main loop
+	reti  ; Force return to the main loop
 
-decrement_number:
-	dec	@R0
-	cjne	@R0, #0FFh, dec_num_end
+INTERRUPCAO_2:
+	inc r6
 
-	mov	@R0, #9
-	inc	R0
-	cjne	R0, #data_ptr+data_len, $+4
+	clr ie.2        ; Desativa interrupção externa 0 temporariamente
+	clr tcon.1      ; Limpa manualmente a flag de interrupção externa 1 (IE1)
+
+	reti  ; Force return to the main loop
+
+DECREMENT_NUMBER:
+	dec	@r0
+	cjne	@r0, #0ffh, DEC_NUM_END
+
+	mov	@r0, #9
+	inc	r0
+	cjne	r0, #data_ptr+data_len, $+4
 	ret
-	call	decrement_number
-dec_num_end:
+	call	DECREMENT_NUMBER
+DEC_NUM_END:
 	ret
 
 ;; Display the number on the LED display
-display_number:
-	dec	R0
-	mov	A, B
-	rr	A
-	mov	B, A
+DISPLAY_NUMBER:
+	dec	r0
+	mov	a, b
+	rr	a
+	mov	b, a
 
-	mov	A, @R0
-	movc	A, @A+DPTR
+	mov	a, @r0
+	movc	a, @a+dptr
 
-	mov	P0, #0FFh
-	mov	P1, A
-	mov	P0, B
+	mov	p0, #0ffh
+	mov	p1, a
+	mov	p0, b
 
-	cjne	R0, #data_ptr, display_number
+	cjne	r0, #data_ptr, DISPLAY_NUMBER
 	ret
 
-check_zero:
-	mov	A, data_ptr+0
-	jnz	not_zero
-	mov	A, data_ptr+1
-	jnz	not_zero
-	mov	A, data_ptr+2
-	jnz	not_zero
-	mov	A, data_ptr+3
-	jnz	not_zero
-	clr	ACC.7
+CHECK_ZERO:
+	mov	a, data_ptr+0
+	jnz	NOT_ZERO
+	mov	a, data_ptr+1
+	jnz	NOT_ZERO
+	mov	a, data_ptr+2
+	jnz	NOT_ZERO
+	mov	a, data_ptr+3
+	jnz	NOT_ZERO
+	clr	acc.7
 	ret
 
-not_zero:
-	mov	A, #1  ; Acumulador ≠ 0 -> Z flag limpa
+NOT_ZERO:
+	mov	a, #1  ; Acumulador ≠ 0 -> Z flag limpa
 	ret
 
 ; -----------------------------------------------
 ; PROGRAM START
 ; -----------------------------------------------
-start:
-        mov IP, #00000101B	;Definindo INT0 e INT1 com alta prioridade
-    	mov IE, #10000111B  ; Habilita interrupção externa 0 (EX0) e global (EA)
-    	mov TCON, #00010001B  ; Configura INT0 para borda de descida
+START:
+	mov	ip, #00000101b	; Definindo INT0 e INT1 com alta prioridade
+	mov	ie, #10000111b  ; Habilita interrupção externa 0 (EX0) e global (EA)
+	mov	tcon, #00010001b  ; Configura INT0 para borda de descida
 
-        clr TR0       ; Garante que o Timer 0 está desligado
-    	mov TMOD, #01H  ; Configura Timer 0 no modo 1
+	clr	tr0       ; Garante que o Timer 0 está desligado
+	mov	tmod, #01h  ; Configura Timer 0 no modo 1
 
-	mov	B, #0EEh
-	mov	DPTR, #numbers
+	mov	b, #0eeh
+	mov	dptr, #numbers
 	mov	data_ptr+2, #0
 	mov	data_ptr+3, #0
-	MOV P2, #07H
-	MOV R7, #01H
+	mov	p2, #07h
+	mov 	r6, #01H
+	mov	r7, #01h
+
+	clr 	ie.0
+    	clr 	ie.2
 
 ; -----------------------------------------------
 ; MAIN LOOP
 ; -----------------------------------------------
-main:
-	call rotina_10_s
-	call rotina_3_s
-	call rotina_7_s
-	jmp main
+MAIN:
+	call ROTINA_10_S
+	call ROTINA_3_S
+	call ROTINA_7_S
+	jmp MAIN
 
-rotina_10_s:
-	mov	data_ptr+0, #0
+ROTINA_15_S:
+	MOV R6, #00H
+	MOV R0, #09H
+	mov	data_ptr+0, #5
 	mov	data_ptr+1, #1
-	MOV P2, #03H
-
-loop_10_s:
-	mov	R0, #data_ptr+data_len
-	call	display_number
-	call	DELAY
-
-	call check_zero
-	jz fim_rotina
-
-	mov	R0, #data_ptr
-	call	decrement_number
-
+	mov	p2, #03h
 	jmp loop_10_s
 
-rotina_3_s:
+ROTINA_10_S:
+	clr 	ie.0     ; Disable external interrupt
+	mov	data_ptr+0, #0
+	mov	data_ptr+1, #1
+	mov	p2, #03h
+
+LOOP_10_S:
+	setb 	ie.2
+
+	mov	r0, #data_ptr+data_len
+	call	DISPLAY_NUMBER
+	call	DELAY
+
+	call	CHECK_ZERO
+	jz	FIM_ROTINA_10S
+
+	mov	r0, #data_ptr
+	call	DECREMENT_NUMBER
+
+	mov A, R6       ; Move R6 para o acumulador
+    	clr C
+    	SUBB A, #05H
+    	JNC ROTINA_15_S
+
+	jmp	LOOP_10_S
+
+ROTINA_3_S:
 	mov	data_ptr+0, #3
 	mov	data_ptr+1, #0
-	MOV P2, #05H
+	mov	p2, #05h
 
-loop_3_s:
-	mov	R0, #data_ptr+data_len
-	call	display_number
+LOOP_3_S:
+	mov	r0, #data_ptr+data_len
+	call	DISPLAY_NUMBER
 	call	DELAY
 
-	call check_zero
-	jz fim_rotina
+	call	CHECK_ZERO
+	jz	FIM_ROTINA
 
-	mov	R0, #data_ptr
-	call	decrement_number
+	mov	r0, #data_ptr
+	call	DECREMENT_NUMBER
 
-	jmp loop_3_s
+	jmp	LOOP_3_S
 
-rotina_7_s:
+ROTINA_7_S:
 	mov	data_ptr+0, #7
 	mov	data_ptr+1, #0
-	mov P2, #06H
+	mov	p2, #06h
 
-loop_7_s:
-        clr IE.0     ; Disable external interrupt
+LOOP_7_S:
+	clr	ie.0     ; Disable external interrupt
 
-	mov	R0, #data_ptr+data_len
-	call	display_number
+	mov	r0, #data_ptr+data_len
+	call	DISPLAY_NUMBER
 	call	DELAY
 
-	setb IE.0    ; Re-enable external interrupt
+	setb	ie.0    ; Re-enable external interrupt
 
-	call check_zero
-	jz fim_rotina_7s
+	call	CHECK_ZERO
+	jz	FIM_ROTINA_7S
 
-	mov A, R7
-	jz fim_rotina_7s
+	mov	a, r7
+	jz	FIM_ROTINA_7S
 
-	mov	R0, #data_ptr
-	call	decrement_number
+	mov	r0, #data_ptr
+	call	DECREMENT_NUMBER
 
-	jmp loop_7_s
+	jmp	LOOP_7_S
 
-fim_rotina_7s:
-	mov R7, #01H
+FIM_ROTINA_7S:
+	mov	r7, #01h
 	ret
 
-fim_rotina:
+FIM_ROTINA_10S:
+	mov r6, #01h
+	ret
+
+FIM_ROTINA:
 	ret
 
 ; -----------------------------------------------
 ; Delay de aproximadamente 50 ms com Timer 0
 ; -----------------------------------------------
 DELAY:
-	mov TH0, #0FFH      ; Carrega alto byte
-	mov TL0, #0E0H      ; Carrega baixo byte
-	setb TR0            ; Inicia Timer 0
-espera:
-	jnb TF0, espera     ; Espera overflow
-	clr TR0             ; Para o timer
-	clr TF0             ; Limpa o flag
+	mov	th0, #0ffh      ; Carrega alto byte
+	mov	tl0, #0e0h      ; Carrega baixo byte
+	setb	tr0            ; Inicia Timer 0
+ESPERA:
+	jnb	tf0, ESPERA     ; Espera overflow
+	clr	tr0             ; Para o timer
+	clr	tf0             ; Limpa o flag
 	ret
 
 end
