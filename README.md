@@ -26,7 +26,8 @@ O sistema exibe números decrescentes em um conjunto de quatro displays de 7 seg
 
 3. **Leitura de Chaves DIP (P3)**:
    - As chaves DIP em **P3.2 e P3.3** determinam certas condições do sistema.
-   - O sistema reage às mudanças das chaves, podendo alterar a contagem ou modificar estados internos.
+   - Estão associadas a rotinas de interrupção.
+   - O sistema reage às mudanças das chaves, podendo realizar uma contagem ou iniciar o a rotina de sinal vermelho com 15 segundos de duração.
 
 ## Como Executar
 ### Requisitos:
@@ -40,12 +41,13 @@ O sistema exibe números decrescentes em um conjunto de quatro displays de 7 seg
 2. Abra o arquivo `.asm` em um ambiente de desenvolvimento compatível.
 3. Compile o código Assembly.
 4. Carregue o binário no simulador ou grave no microcontrolador 8051.
-5. Execute o código e observe os displays de 7 segmentos, LEDs e chaves DIP em ação.
+5. Carregue os arquivos de configuração do display de 7 segmentos, chaves e LEDs.
+6. Execute o código e observe os displays de 7 segmentos, LEDs e chaves DIP em ação.
 
 ## Comportamento do Sistema
 - O número exibido nos displays começa a contar regressivamente.
 - Diferentes sequências de LEDs indicam estados do sistema (sinais verde, amarelo e vermelho).
-- Alterando as chaves DIP, o usuário pode modificar a contagem ou reiniciar o sistema.
+- Alterando as chaves DIP, o usuário pode iniciar a rotina do sinal vermelho com duração de 15 sega contagem ou contar o fluxo de veículos.
 
 ## Personalização
 - Para alterar os números exibidos, edite a tabela de números na seção `numbers`.
