@@ -22,9 +22,20 @@ numbers: db 11000000b ; 0
 	org	0
 	jmp	start
 
+	ORG 003H
+    		LJMP INTERRUPCAO_1
+
 ; -----------------------------------------------
 ; SUBPROGRAMS
 ; -----------------------------------------------
+INTERRUPCAO_1:
+    MOV R7, #00H
+
+    CLR IE.0        ; Desativa interrupção externa 0 temporariamente
+    CLR TCON.1      ; Limpa manualmente a flag de interrupção externa 0 (IE0)
+
+    RETI  ; Force return to the main loop
+
 decrement_number:
 	dec	@R0
 	cjne	@R0, #0FFh, dec_num_end
@@ -74,11 +85,19 @@ not_zero:
 ; PROGRAM START
 ; -----------------------------------------------
 start:
+        mov IP, #00000101B	;Definindo INT0 e INT1 com alta prioridade
+    	mov IE, #10000111B  ; Habilita interrupção externa 0 (EX0) e global (EA)
+    	mov TCON, #00010001B  ; Configura INT0 para borda de descida
+
+        clr TR0       ; Garante que o Timer 0 está desligado
+    	mov TMOD, #01H  ; Configura Timer 0 no modo 1
+
 	mov	B, #0EEh
 	mov	DPTR, #numbers
 	mov	data_ptr+2, #0
 	mov	data_ptr+3, #0
 	MOV P2, #07H
+	MOV R7, #01H
 
 ; -----------------------------------------------
 ; MAIN LOOP
@@ -128,20 +147,31 @@ loop_3_s:
 rotina_7_s:
 	mov	data_ptr+0, #7
 	mov	data_ptr+1, #0
-	MOV P2, #06H
+	mov P2, #06H
 
 loop_7_s:
+        clr IE.0     ; Disable external interrupt
+
 	mov	R0, #data_ptr+data_len
 	call	display_number
 	call	DELAY
 
+	setb IE.0    ; Re-enable external interrupt
+
 	call check_zero
-	jz fim_rotina
+	jz fim_rotina_7s
+
+	mov A, R7
+	jz fim_rotina_7s
 
 	mov	R0, #data_ptr
 	call	decrement_number
 
 	jmp loop_7_s
+
+fim_rotina_7s:
+	mov R7, #01H
+	ret
 
 fim_rotina:
 	ret
@@ -150,8 +180,6 @@ fim_rotina:
 ; Delay de aproximadamente 50 ms com Timer 0
 ; -----------------------------------------------
 DELAY:
-	mov TMOD, #01h      ; Timer 0, modo 1 (16 bits)
-	clr TF0             ; Limpa o flag de overflow
 	mov TH0, #0FFH      ; Carrega alto byte
 	mov TL0, #0E0H      ; Carrega baixo byte
 	setb TR0            ; Inicia Timer 0
