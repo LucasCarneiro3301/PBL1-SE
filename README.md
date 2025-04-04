@@ -1,5 +1,7 @@
 # README - Código Assembly para 8051
 
+(Arquivo principal: semaforo_novo.asm)
+
 ## Visão Geral
 Este repositório contém um código Assembly para o microcontrolador 8051, implementando um sistema de exibição em displays de 7 segmentos multiplexados. O código também controla LEDs de indicação e recebe entradas de chaves DIP.
 
