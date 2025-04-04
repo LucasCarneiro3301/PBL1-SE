@@ -14,7 +14,7 @@ O sistema exibe números decrescentes em um conjunto de quatro displays de 7 seg
 ### Componentes e Portas Utilizadas:
 - **P0 (Bits 0, 1)**: Controle do multiplexador dos displays de 7 segmentos.
 - **P1 (Todos os 8 bits)**: Controle dos segmentos do display.
-- **P2 (Bits 0, 1, 2)**: LEDs de indicação.
+- **P2 (Bits 0, 1, 2)**: LEDs do semáforo.
 - **P3 (Bits 2, 3)**: Chaves DIP para entrada de usuário.
 
 ## Como o Sistema Funciona
@@ -24,8 +24,13 @@ O sistema exibe números decrescentes em um conjunto de quatro displays de 7 seg
    - O sistema atualiza os dígitos periodicamente para simular a exibição contínua dos números.
 
 2. **Controle de LEDs (P2)**:
-   - Diferentes valores são escritos em **P2** para ativar ou desativar LEDs de status.
-   - Cada bit representa um LED específico.
+   - Diferentes valores são escritos em **P2** para ativar ou desativar LEDs de semáforo.
+   - Cada led representa um sinal do semáforo.
+   - P2.0 (vermelho), P2.1 (amarelo) e P2.2 (verde)
+
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/fe9a4aca-f545-48c5-8a6f-91ab50b033c7" alt="Painel dos LEDs" width="400"/>
+</div>
 
 3. **Leitura de Chaves DIP (P3)**:
    - As chaves DIP em **P3.2 e P3.3** determinam certas condições do sistema.
