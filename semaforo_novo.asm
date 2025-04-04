@@ -1,3 +1,15 @@
+; P0 (Bits 0, 1) -> Controle do multiplexador do display de 7 segmentos
+; P1 (Todos os 8 bits) -> Controle dos segmentos do display
+; P2 (Bits 0, 1, 2) -> LEDs de indicação
+; P3 (Bits 2, 3) -> Entradas das chaves DIP
+; R0 -> Ponteiro para os dígitos exibidos
+; R6 -> Contador auxiliar
+; R7 -> Flag de emergência e controle de estado
+; DPTR -> Aponta para a tabela de segmentos
+; B -> Armazena temporariamente o controle do multiplexador
+; IE -> Controle de interrupções
+; TCON -> Configuração de interrupções e timers
+
 ; -----------------------------------------------
 ; CONSTANTS
 ; -----------------------------------------------
